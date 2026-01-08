@@ -38,6 +38,7 @@ ENV/
 uploads/
 outputs/
 example_template.pptx
+test_output.pptx
 *.pptx
 
 # OS

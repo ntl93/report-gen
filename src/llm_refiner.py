@@ -5,6 +5,7 @@ LLM-based text refinement module for converting draft text to formal content.
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
+import config
 
 load_dotenv()
 
@@ -24,15 +25,15 @@ class LLMRefiner:
             raise ValueError("OpenAI API key not provided and OPENAI_API_KEY environment variable not set")
         
         self.client = OpenAI(api_key=self.api_key)
-        self.model = "gpt-3.5-turbo"
+        self.model = config.OPENAI_MODEL
     
-    def refine_text(self, draft_text, context="weekly project report"):
+    def refine_text(self, draft_text, context=None):
         """
         Refine draft text into formal, professional content.
         
         Args:
             draft_text: The draft text to refine
-            context: Context for the refinement (e.g., "weekly project report")
+            context: Context for the refinement (default from config)
         
         Returns:
             Refined text
@@ -40,29 +41,23 @@ class LLMRefiner:
         if not draft_text or not draft_text.strip():
             return ""
         
-        prompt = f"""You are a professional business writer. Please refine the following draft text into formal, professional content suitable for a {context}.
-
-Requirements:
-- Maintain all key information and facts
-- Use formal business language
-- Make it clear and concise
-- Keep the same general structure and length
-- Do not add information that isn't in the draft
-
-Draft text:
-{draft_text}
-
-Refined text:"""
+        if context is None:
+            context = config.REFINEMENT_CONTEXT_TEMPLATE
+        
+        prompt = config.REFINEMENT_PROMPT_TEMPLATE.format(
+            context=context,
+            draft_text=draft_text
+        )
         
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": "You are a professional business writer who refines draft text into polished, formal content."},
+                    {"role": "system", "content": config.SYSTEM_PROMPT},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.7,
-                max_tokens=1000
+                temperature=config.OPENAI_TEMPERATURE,
+                max_tokens=config.OPENAI_MAX_TOKENS
             )
             
             refined_text = response.choices[0].message.content.strip()

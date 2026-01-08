@@ -8,6 +8,7 @@ from io import BytesIO
 from src.pptx_handler import PPTXHandler
 from src.llm_refiner import LLMRefiner
 from src.image_handler import ImageHandler
+import config
 
 
 def init_session_state():
@@ -24,14 +25,14 @@ def init_session_state():
 
 def main():
     st.set_page_config(
-        page_title="Weekly Report Generator",
-        page_icon="📊",
-        layout="wide"
+        page_title=config.APP_TITLE,
+        page_icon=config.APP_ICON,
+        layout=config.PAGE_LAYOUT
     )
     
     init_session_state()
     
-    st.title("📊 Weekly PowerPoint Report Generator")
+    st.title(f"{config.APP_ICON} {config.APP_TITLE}")
     st.markdown("""
     Generate professional weekly reports with consistent styling and LLM-refined content.
     """)
@@ -76,7 +77,7 @@ def upload_reference_reports():
     
     uploaded_files = st.file_uploader(
         "Choose PowerPoint files (.pptx)",
-        type=['pptx'],
+        type=config.ALLOWED_PPTX_EXTENSIONS,
         accept_multiple_files=True,
         key="reference_files"
     )
@@ -121,7 +122,7 @@ def upload_images():
     
     uploaded_images = st.file_uploader(
         "Choose image files",
-        type=['png', 'jpg', 'jpeg'],
+        type=config.ALLOWED_IMAGE_EXTENSIONS,
         accept_multiple_files=True,
         key="image_files"
     )
@@ -138,7 +139,7 @@ def upload_images():
                 slide_index = st.number_input(
                     "Slide number",
                     min_value=0,
-                    max_value=10,
+                    max_value=config.MAX_SLIDES_PER_REPORT,
                     value=0,
                     key=f"slide_idx_{idx}"
                 )
@@ -146,26 +147,16 @@ def upload_images():
             with col2:
                 position = st.selectbox(
                     "Position",
-                    options=[
-                        'center',
-                        'top-left',
-                        'top-right',
-                        'top-center',
-                        'bottom-left',
-                        'bottom-right',
-                        'bottom-center',
-                        'middle-left',
-                        'middle-right'
-                    ],
+                    options=config.IMAGE_POSITIONS,
                     key=f"position_{idx}"
                 )
             
             with col3:
                 width = st.slider(
                     "Width (inches)",
-                    min_value=1.0,
-                    max_value=8.0,
-                    value=4.0,
+                    min_value=config.MIN_IMAGE_WIDTH,
+                    max_value=config.MAX_IMAGE_WIDTH,
+                    value=config.DEFAULT_IMAGE_WIDTH,
                     step=0.5,
                     key=f"width_{idx}"
                 )
@@ -210,8 +201,8 @@ def create_content():
     num_slides = st.number_input(
         "How many slides do you want to create?",
         min_value=1,
-        max_value=20,
-        value=3,
+        max_value=config.MAX_SLIDES_PER_REPORT,
+        value=config.DEFAULT_NUM_SLIDES,
         key="num_slides"
     )
     

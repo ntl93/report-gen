@@ -5,6 +5,7 @@ Image handler for managing uploaded images and their placement in presentations.
 from PIL import Image
 import io
 from pptx.util import Inches
+import config
 
 
 class ImageHandler:
@@ -13,7 +14,7 @@ class ImageHandler:
     def __init__(self):
         self.images = []
     
-    def add_image(self, image_file, slide_index, position_description="center", width=4):
+    def add_image(self, image_file, slide_index, position_description="center", width=None):
         """
         Add an image with placement information.
         
@@ -21,11 +22,14 @@ class ImageHandler:
             image_file: File-like object containing the image
             slide_index: Index of the slide where the image should be placed
             position_description: Description of where to place the image
-            width: Width of the image in inches
+            width: Width of the image in inches (default from config)
         
         Returns:
             Dictionary containing image data
         """
+        if width is None:
+            width = config.DEFAULT_IMAGE_WIDTH
+            
         # Calculate position based on description
         left, top = self._parse_position(position_description)
         
@@ -51,19 +55,10 @@ class ImageHandler:
         Returns:
             Tuple of (left, top) in inches
         """
-        position_map = {
-            'center': (2.5, 2.5),
-            'top-left': (0.5, 0.5),
-            'top-right': (5.5, 0.5),
-            'bottom-left': (0.5, 5),
-            'bottom-right': (5.5, 5),
-            'top-center': (2.5, 0.5),
-            'bottom-center': (2.5, 5),
-            'middle-left': (0.5, 2.5),
-            'middle-right': (5.5, 2.5),
-        }
-        
-        return position_map.get(position_description.lower(), (2.5, 2.5))
+        return config.POSITION_COORDINATES.get(
+            position_description.lower(),
+            config.POSITION_COORDINATES['center']
+        )
     
     def get_all_images(self):
         """
@@ -94,3 +89,4 @@ class ImageHandler:
             return True
         except Exception:
             return False
+
