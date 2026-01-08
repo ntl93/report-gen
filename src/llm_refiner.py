@@ -1,9 +1,10 @@
 """
 LLM-based text refinement module for converting draft text to formal content.
+Supports Azure OpenAI and local LLM endpoints compatible with OpenAI API spec.
 """
 
 import os
-from openai import OpenAI
+from openai import OpenAI, AzureOpenAI
 from dotenv import load_dotenv
 import config
 
@@ -11,21 +12,42 @@ load_dotenv()
 
 
 class LLMRefiner:
-    """Refines draft text using OpenAI's GPT models."""
+    """Refines draft text using LLM models (Azure OpenAI or local LLM with OpenAI API spec)."""
     
-    def __init__(self, api_key=None):
+    def __init__(self, api_key=None, base_url=None, api_version=None):
         """
         Initialize the LLM refiner.
         
         Args:
-            api_key: OpenAI API key (optional, will use OPENAI_API_KEY env var if not provided)
+            api_key: API key (optional, will use LLM_API_KEY env var if not provided)
+            base_url: Base URL for API endpoint (optional, will use LLM_BASE_URL env var if not provided)
+            api_version: API version for Azure OpenAI (optional, will use LLM_API_VERSION env var if not provided)
         """
-        self.api_key = api_key or os.getenv('OPENAI_API_KEY')
-        if not self.api_key:
-            raise ValueError("OpenAI API key not provided and OPENAI_API_KEY environment variable not set")
+        self.provider = os.getenv('LLM_PROVIDER', 'azure').lower()
+        self.api_key = api_key or os.getenv('LLM_API_KEY')
+        self.base_url = base_url or os.getenv('LLM_BASE_URL')
+        self.api_version = api_version or os.getenv('LLM_API_VERSION', '2024-02-15-preview')
         
-        self.client = OpenAI(api_key=self.api_key)
-        self.model = config.OPENAI_MODEL
+        if not self.api_key:
+            raise ValueError("LLM API key not provided and LLM_API_KEY environment variable not set")
+        
+        # Initialize client based on provider
+        if self.provider == 'azure':
+            if not self.base_url:
+                raise ValueError("Azure OpenAI endpoint not provided. Set LLM_BASE_URL environment variable")
+            self.client = AzureOpenAI(
+                api_key=self.api_key,
+                api_version=self.api_version,
+                azure_endpoint=self.base_url
+            )
+        else:
+            # Local LLM or OpenAI-compatible endpoint
+            if self.base_url:
+                self.client = OpenAI(api_key=self.api_key, base_url=self.base_url)
+            else:
+                self.client = OpenAI(api_key=self.api_key)
+        
+        self.model = config.LLM_MODEL
     
     def refine_text(self, draft_text, context=None):
         """
@@ -56,8 +78,8 @@ class LLMRefiner:
                     {"role": "system", "content": config.SYSTEM_PROMPT},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=config.OPENAI_TEMPERATURE,
-                max_tokens=config.OPENAI_MAX_TOKENS
+                temperature=config.LLM_TEMPERATURE,
+                max_tokens=config.LLM_MAX_TOKENS
             )
             
             refined_text = response.choices[0].message.content.strip()

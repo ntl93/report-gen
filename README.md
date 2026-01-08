@@ -13,7 +13,7 @@ A web application that generates weekly PowerPoint reports with consistent styli
 ## Requirements
 
 - Python 3.8+
-- OpenAI API key (for content refinement)
+- LLM API access (Azure OpenAI or local LLM with OpenAI API spec)
 
 ## Installation
 
@@ -34,10 +34,25 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Create a `.env` file with your OpenAI API key:
-```bash
-echo "OPENAI_API_KEY=your-api-key-here" > .env
-```
+4. Create a `.env` file with your LLM API configuration:
+
+   **For Azure OpenAI:**
+   ```bash
+   cp .env.example .env
+   # Edit .env and configure:
+   # LLM_PROVIDER=azure
+   # LLM_API_KEY=your-azure-api-key
+   # LLM_BASE_URL=https://your-resource-name.openai.azure.com/
+   ```
+
+   **For Local LLM (compatible with OpenAI API spec):**
+   ```bash
+   cp .env.example .env
+   # Edit .env and configure:
+   # LLM_PROVIDER=local
+   # LLM_API_KEY=your-api-key-or-dummy
+   # LLM_BASE_URL=http://localhost:1234/v1
+   ```
 
 ## Usage
 
@@ -74,7 +89,7 @@ report-gen/
 ## How It Works
 
 1. **Style Extraction**: The app analyzes reference PowerPoint files to extract slide masters, theme colors, fonts, and layouts
-2. **Content Refinement**: Draft text is sent to OpenAI's GPT model to be refined into formal, professional content
+2. **Content Refinement**: Draft text is sent to an LLM (Azure OpenAI or local LLM) to be refined into formal, professional content
 3. **Report Generation**: A new PowerPoint is created using the extracted styles and refined content
 4. **Image Insertion**: Uploaded images are inserted at specified locations in the report
 

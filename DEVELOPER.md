@@ -42,7 +42,7 @@ report-gen/
    - Adds images to slides
 
 3. **llm_refiner.py** - AI Content Refinement
-   - Integrates with OpenAI API
+   - Integrates with Azure OpenAI or local LLM
    - Refines draft text to professional language
    - Configurable prompts and parameters
 
@@ -81,7 +81,7 @@ pip install -r requirements.txt
 
 # Create environment file
 cp .env.example .env
-# Edit .env and add your OpenAI API key
+# Edit .env and add your LLM API configuration
 ```
 
 ### Running the Application
@@ -254,10 +254,11 @@ handler.clear_images()
 - Ensure you're in the virtual environment
 - Run `pip install -r requirements.txt`
 
-### "OpenAI API Error"
-- Check `.env` file exists and has valid API key
-- Verify API key has credits available
-- Check internet connection
+### "LLM API Error"
+- Check `.env` file exists and has valid API configuration
+- For Azure: Verify API key, endpoint URL, and deployment name
+- For Local: Verify the LLM server is running and accessible
+- Check internet connection (for Azure)
 
 ### "Streamlit won't start"
 - Check if port 8501 is already in use
@@ -295,7 +296,8 @@ handler.clear_images()
 Potential areas for improvement:
 
 1. **Multiple LLM Providers**
-   - Add support for Anthropic Claude, Azure OpenAI
+   - Already supports Azure OpenAI and local LLM
+   - Could add support for Anthropic Claude
    - Make provider selectable in UI
 
 2. **Template Gallery**

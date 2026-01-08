@@ -38,9 +38,9 @@ def main():
     """)
     
     # Check for API key
-    api_key = os.getenv('OPENAI_API_KEY')
+    api_key = os.getenv('LLM_API_KEY')
     if not api_key:
-        st.warning("⚠️ OpenAI API key not found. Please set OPENAI_API_KEY in your .env file.")
+        st.warning("⚠️ LLM API key not found. Please set LLM_API_KEY in your .env file.")
         st.info("The application will still work, but content will not be refined by AI.")
     
     # Create tabs for different sections
@@ -289,7 +289,7 @@ def generate_report():
     use_ai_refinement = st.checkbox(
         "Refine content with AI",
         value=True,
-        help="Use OpenAI to refine draft text into professional language"
+        help="Use LLM to refine draft text into professional language"
     )
     
     if st.button("🎯 Generate Report", type="primary"):
@@ -299,7 +299,7 @@ def generate_report():
                 slides_data = st.session_state.slides_data
                 
                 # Refine content if requested and API key is available
-                if use_ai_refinement and os.getenv('OPENAI_API_KEY'):
+                if use_ai_refinement and os.getenv('LLM_API_KEY'):
                     st.info("🤖 Refining content with AI...")
                     try:
                         llm_refiner = LLMRefiner()
@@ -329,7 +329,7 @@ def generate_report():
                 )
                 
                 # Show preview of refined content
-                if use_ai_refinement and os.getenv('OPENAI_API_KEY'):
+                if use_ai_refinement and os.getenv('LLM_API_KEY'):
                     with st.expander("View Refined Content"):
                         for idx, slide in enumerate(slides_data):
                             st.markdown(f"**Slide {idx + 1}: {slide['title']}**")

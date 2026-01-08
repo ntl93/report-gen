@@ -13,7 +13,7 @@ pip install -r requirements.txt
 # Copy the example environment file
 cp .env.example .env
 
-# Edit .env and add your OpenAI API key
+# Edit .env and add your LLM API configuration
 nano .env  # or use your preferred editor
 ```
 
@@ -119,9 +119,11 @@ Slides:
 
 ## Troubleshooting
 
-### "OpenAI API key not found"
+### "LLM API key not found"
 - Make sure you've created a `.env` file
-- Add your API key: `OPENAI_API_KEY=sk-...`
+- Add your API configuration based on your provider:
+  - For Azure: `LLM_PROVIDER=azure`, `LLM_API_KEY=...`, `LLM_BASE_URL=...`
+  - For Local LLM: `LLM_PROVIDER=local`, `LLM_API_KEY=...`, `LLM_BASE_URL=...`
 - Restart the application
 
 ### "No reference presentation loaded"
@@ -173,19 +175,50 @@ To create multiple reports:
 4. **Review AI output** - Check the "View Refined Content" section before downloading
 5. **Save your work** - Download generated reports immediately
 
-## API Key Information
+## LLM Configuration
 
-The application uses OpenAI's GPT-3.5-turbo model for content refinement.
+The application supports two types of LLM providers:
+
+### Azure OpenAI
+
+**Setup:**
+1. Get your Azure OpenAI resource from Azure Portal
+2. Copy the API key and endpoint
+3. Configure in `.env`:
+   ```
+   LLM_PROVIDER=azure
+   LLM_API_KEY=your-azure-api-key
+   LLM_BASE_URL=https://your-resource-name.openai.azure.com/
+   LLM_API_VERSION=2024-02-15-preview
+   ```
 
 **Approximate costs:**
 - Per report generation: $0.001 - $0.01 (depending on content length)
 - 100 reports: ~$0.10 - $1.00
 
-**Getting an API key:**
-1. Go to https://platform.openai.com/api-keys
-2. Create an account or sign in
-3. Click "Create new secret key"
-4. Copy the key to your `.env` file
+### Local LLM (OpenAI API Compatible)
+
+**Supported local LLM servers:**
+- LM Studio
+- LocalAI
+- vLLM
+- Ollama (with OpenAI compatibility layer)
+- Any other OpenAI-compatible endpoint
+
+**Setup:**
+1. Start your local LLM server with OpenAI API compatibility
+2. Configure in `.env`:
+   ```
+   LLM_PROVIDER=local
+   LLM_API_KEY=dummy-or-your-key
+   LLM_BASE_URL=http://localhost:1234/v1
+   ```
+
+**Benefits:**
+- No API costs
+- Data privacy (runs locally)
+- No internet connection required
+- Full control over the model
 
 ## Security Notes
 

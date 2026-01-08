@@ -2,10 +2,12 @@
 Configuration file for the report generator application.
 """
 
-# OpenAI Configuration
-OPENAI_MODEL = "gpt-3.5-turbo"
-OPENAI_TEMPERATURE = 0.7
-OPENAI_MAX_TOKENS = 1000
+# LLM Configuration
+# Supported providers: 'azure' (Azure OpenAI) or 'local' (local LLM with OpenAI API spec)
+LLM_PROVIDER = "azure"  # Default provider
+LLM_MODEL = "gpt-35-turbo"  # For Azure: deployment name, For local: model name
+LLM_TEMPERATURE = 0.7
+LLM_MAX_TOKENS = 1000
 
 # Streamlit Configuration
 APP_TITLE = "Weekly PowerPoint Report Generator"
