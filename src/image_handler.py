@@ -86,6 +86,7 @@ class ImageHandler:
         try:
             img = Image.open(image_file)
             img.verify()
+            image_file.seek(0)  # Reset file pointer after validation
             return True
         except Exception:
             return False

@@ -40,7 +40,8 @@ class PPTXHandler:
             theme = self.reference_pres.slide_master.theme
             for i, color in enumerate(theme.theme_color_scheme):
                 self.theme_colors[f'color_{i}'] = color
-        except:
+        except (AttributeError, NotImplementedError) as e:
+            # Some presentations may not have theme colors accessible
             pass
     
     def create_report_from_template(self, content_data, images_data=None):

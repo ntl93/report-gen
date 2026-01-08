@@ -166,12 +166,20 @@ def upload_images():
         if st.button("Save Image Configurations", type="primary"):
             st.session_state.image_handler.clear_images()
             
+            # Validate and add images
+            invalid_images = []
             for idx, img_file in enumerate(uploaded_images):
                 slide_idx = st.session_state[f"slide_idx_{idx}"]
                 position = st.session_state[f"position_{idx}"]
                 width = st.session_state[f"width_{idx}"]
                 
-                # Reset file pointer
+                # Reset file pointer and validate
+                img_file.seek(0)
+                if not st.session_state.image_handler.validate_image(img_file):
+                    invalid_images.append(img_file.name)
+                    continue
+                
+                # Reset file pointer again after validation
                 img_file.seek(0)
                 st.session_state.image_handler.add_image(
                     img_file,
@@ -180,7 +188,14 @@ def upload_images():
                     width
                 )
             
-            st.success(f"✅ Configured {len(uploaded_images)} image(s)")
+            if invalid_images:
+                st.warning(f"⚠️ Skipped invalid image(s): {', '.join(invalid_images)}")
+            
+            valid_count = len(uploaded_images) - len(invalid_images)
+            if valid_count > 0:
+                st.success(f"✅ Configured {valid_count} valid image(s)")
+            else:
+                st.error("❌ No valid images to configure")
 
 
 def create_content():
